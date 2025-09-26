@@ -1,0 +1,195 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        16
+      ],
+      "id": "6d991385-7f76-494a-b86d-810c7cef6bf7",
+      "name": "When chat message received",
+      "webhookId": "51295b7f-67a2-4639-873c-f2da79870307"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Vous êtes un assistant dans un laboratoire de recherche. Ton rôle est d'envoyer un email aux doctorants du laboratoire. Le message consiste à faire un appel à contributions à la journée doctorale organisée par le laboratoire 2IACS. Pour les doctorants de première année, il faudrait préciser qu'ils doivent préparer un poster. Les doctorants de deuxième année, troisième et quatrième année doivent participer avec une présentation orale. Le mail à envoyer devrait contenir aussi un résumé du planning de la journée doctorale. Le mail devrait être aussi bien formaté au format HTML. Le mail est considéré être envoyé par le comité d'organisation\n\nUne fois les emails envoyés, Mettre a jour la date d'envoie du message."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "3ebc1186-ff2b-4b3a-8c18-4e394e715cb4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        224
+      ],
+      "id": "e8fc53d0-b0d7-4549-bf23-3e0c93348eec",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Consulter la liste des doctorants",
+        "documentId": {
+          "__rl": true,
+          "value": "1H7da8xR42TAW2LR_wIJ1axfNY3v9qmVvY1occguaeO4",
+          "mode": "list",
+          "cachedResultName": "doctorants",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H7da8xR42TAW2LR_wIJ1axfNY3v9qmVvY1occguaeO4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "participants",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H7da8xR42TAW2LR_wIJ1axfNY3v9qmVvY1occguaeO4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        208
+      ],
+      "id": "eb1b6494-61b4-459e-b3da-4be79a7c2b8f",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ojlKLs2f3weaZyXf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Permet d'envoyer un email",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "Appel a participation",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "03a57521-13a9-48a3-8034-bc61237404c6",
+      "name": "Send a message in Gmail",
+      "webhookId": "749351e3-61e0-4fcc-b348-9e38c41f09ea",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "n5IzlY4wc8uJooGc",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        208
+      ],
+      "id": "78a6becd-6b00-44c4-9552-af92fe0b6eae",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "DIhZ3oHJJJ1OhCSR",
+          "name": "DeepSeek account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bf855c14-6730-445a-826a-678ccd0fadde",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c230fd284d995276cf5724f6691594bff122216e1ce75637f16a8b5a0d2854da"
+  },
+  "id": "FoaFDFYp2rZSH27j",
+  "tags": []
+}
